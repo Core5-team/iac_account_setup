@@ -76,7 +76,7 @@ module "lb" {
   instance_type      = "t3.micro"
   key_name           = aws_key_pair.jenkins-key-pair.key_name
   dns_name           = "birdwatching.pp.ua"
-  public_subnet_cidr = "10.0.2.0/24"
+  public_subnet_cidr = "10.0.50.0/24"
 }
 
 module "web" {
@@ -89,7 +89,7 @@ module "web" {
   ami                     = "ami-0a5b0d219e493191b"
   instance_type           = "t3.micro"
   key_name                = aws_key_pair.jenkins-key-pair.key_name
-  private_web_subnet_cidr = "10.0.3.0/24"
+  private_web_subnet_cidr = "10.0.70.0/24"
   nat_gateway_id          = module.lb.nat_gateway_id
   allowed_cidrs           = [module.lb.security_group_id]
 }
@@ -104,7 +104,7 @@ module "db" {
   ami               = "ami-0a5b0d219e493191b"
   instance_type     = "t3.micro"
   key_pair          = aws_key_pair.jenkins-key-pair.key_name
-  db_subnet_cidr    = "10.0.4.0/24"
+  db_subnet_cidr    = "10.0.60.0/24"
   nat_gateway_id    = module.lb.nat_gateway_id
   allowed_cidrs     = [module.web.security_group_id]
 }
