@@ -1,5 +1,4 @@
 
-
 terraform {
   required_version = ">= 1.5.0"
 }
@@ -7,7 +6,6 @@ terraform {
 
 provider "aws" {
   region  = var.aws_region
-  # profile = var.profile
 
    assume_role {
     role_arn     = var.role_arn
@@ -45,7 +43,7 @@ module "jenkins" {
   vpc_id = module.vpc.vpc_id
   igw_id = module.vpc.internet_gateway_id
   env = "stage"
-  ami = "ami-0a5b0d219e493191b"
+  ami = var.jenkins_ami_id
   instance_type = "t3.medium"
   availability_zone = "eu-central-1a"
   subnet_cidr = "10.0.1.0/24"
