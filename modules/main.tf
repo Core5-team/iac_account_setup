@@ -37,6 +37,9 @@ module "sg" {
   main_vpc_id = module.vpc.vpc_id
 }
 
+module "iam_ssm" {
+  source = "./modules/iam_ssm"
+}
 
 module "consul_server" {
   source            = "./consul_server"
@@ -67,16 +70,17 @@ module "jenkins" {
 module "lb" {
   source = "git::https://github.com/The-A-Team-organization/iac_birdwatching.git//modules/lb?ref=TAT-93-Refactor-and-Extend-Terraform-Configuration-From-Module-1-for-Birdwatching-Application-Infrastructure"
 
-  vpc_id             = module.vpc.vpc_id
-  igw_id             = module.vpc.internet_gateway_id
-  availability_zone  = "eu-central-1a"
-  common_tags        = { env = "stage" }
-  env                = "stage"
-  ami                = "ami-0a5b0d219e493191b"
-  instance_type      = "t3.micro"
-  key_name           = aws_key_pair.jenkins-key-pair.key_name
-  dns_name           = "birdwatching.pp.ua"
-  public_subnet_cidr = "10.0.50.0/24"
+  vpc_id               = module.vpc.vpc_id
+  igw_id               = module.vpc.internet_gateway_id
+  availability_zone    = "eu-central-1a"
+  common_tags          = { env = "stage" }
+  env                  = "stage"
+  ami                  = "ami-0a5b0d219e493191b"
+  instance_type        = "t3.micro"
+  key_name             = aws_key_pair.jenkins-key-pair.key_name
+  dns_name             = "birdwatching.pp.ua"
+  public_subnet_cidr   = "10.0.50.0/24"
+  iam_instance_profile = module.iam_ssm.ssm_instance_profile_name
 }
 
 module "web" {
@@ -97,16 +101,17 @@ module "web" {
 module "db" {
   source = "git::https://github.com/The-A-Team-organization/iac_birdwatching.git//modules/db?ref=TAT-93-Refactor-and-Extend-Terraform-Configuration-From-Module-1-for-Birdwatching-Application-Infrastructure"
 
-  vpc_id            = module.vpc.vpc_id
-  availability_zone = "eu-central-1a"
-  common_tags       = { env = "stage" }
-  env               = "stage"
-  ami               = "ami-0a5b0d219e493191b"
-  instance_type     = "t3.micro"
-  key_pair          = aws_key_pair.jenkins-key-pair.key_name
-  db_subnet_cidr    = "10.0.60.0/24"
-  nat_gateway_id    = module.lb.nat_gateway_id
-  allowed_cidrs     = [module.web.security_group_id, module.jenkins.security_group_id, module.consul_server[0].sg_id]
+  vpc_id               = module.vpc.vpc_id
+  availability_zone    = "eu-central-1a"
+  common_tags          = { env = "stage" }
+  env                  = "stage"
+  ami                  = "ami-0a5b0d219e493191b"
+  instance_type        = "t3.micro"
+  key_pair             = aws_key_pair.jenkins-key-pair.key_name
+  db_subnet_cidr       = "10.0.60.0/24"
+  nat_gateway_id       = module.lb.nat_gateway_id
+  allowed_cidrs        = [module.web.security_group_id, module.jenkins.security_group_id, module.consul_server[0].sg_id]
+  iam_instance_profile = module.iam_ssm.ssm_instance_profile_name
 }
 
 # module "sonarqube" {
