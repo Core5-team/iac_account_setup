@@ -64,3 +64,10 @@ variable "out_port" {
   description = "Port for outgoing connections from instances"
 }
 
+variable "cidr_blocks" {
+  type = list(string)
+  default = [
+    "0.0.0.0/0"
+  ]
+  description = "CIDR blocks for internet connection"
+}

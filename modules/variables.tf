@@ -18,18 +18,11 @@ variable "ami_id" {
   default     = "ami-0a5b0d219e493191b"
 }
 
-variable "ssh_key_name" {
+variable "jenkins_ami_id" {
   type        = string
-  description = "SSH key name"
-  default     = "adminKey"
+  description = "AMI ID for Jenkins EC2 instance"
+  default     = "ami-028a27dbcf0c459d5"
 }
-
-variable "profile" {
-  type        = string
-  description = "AWS CLI profile name"
-  default = "default"
-}
-
 
 
 variable "enable_jenkins" {
