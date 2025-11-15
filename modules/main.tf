@@ -103,7 +103,7 @@ module "db" {
   env               = "stage"
   ami               = "ami-0a5b0d219e493191b"
   instance_type     = "t3.micro"
-  key_name          = aws_key_pair.jenkins-key-pair.key_name
+  key_pair          = aws_key_pair.jenkins-key-pair.key_name
   db_subnet_cidr    = "10.0.4.0/24"
   nat_gateway_id    = module.lb.nat_gateway_id
   allowed_cidrs     = ["10.0.0.0/16"]
