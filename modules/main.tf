@@ -77,7 +77,6 @@ module "lb" {
   key_name           = aws_key_pair.jenkins-key-pair.key_name
   dns_name           = "birdwatching.pp.ua"
   public_subnet_cidr = "10.0.2.0/24"
-  private_subnets    = module.vpc.private_subnet_ids
 }
 
 module "web" {
