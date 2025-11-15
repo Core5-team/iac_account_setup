@@ -21,7 +21,7 @@ variable "ami_id" {
 variable "jenkins_ami_id" {
   type        = string
   description = "AMI ID for Jenkins EC2 instance"
-  default     = "ami-028a27dbcf0c459d5"
+  default     = "ami-0051c13afc17b19d8"
 }
 
 

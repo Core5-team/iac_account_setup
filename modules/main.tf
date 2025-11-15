@@ -62,7 +62,6 @@ module "jenkins" {
   availability_zone = "eu-central-1a"
   subnet_cidr       = "10.0.1.0/24"
   count             = var.enable_jenkins ? 1 : 0
-
 }
 
 module "lb" {
