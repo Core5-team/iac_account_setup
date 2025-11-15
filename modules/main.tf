@@ -96,7 +96,7 @@ module "web" {
 }
 
 module "db" {
-  source = "git::https://github.com/The-A-Team-organization/iac_core.git//modules/db?ref=TAT-86-Create-Stage-Infrastructure-Terraform-Jenkins-ECR-SonarQube-IAM-Cross-Account-Policies"
+  source = "git::https://github.com/The-A-Team-organization/iac_birdwatching.git//modules/db?ref=TAT-93-Refactor-and-Extend-Terraform-Configuration-From-Module-1-for-Birdwatching-Application-Infrastructure"
 
   vpc_id            = module.vpc.vpc_id
   availability_zone = "eu-central-1a"
