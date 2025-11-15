@@ -91,7 +91,7 @@ module "web" {
   key_name                = aws_key_pair.jenkins-key-pair.key_name
   private_web_subnet_cidr = "10.0.70.0/24"
   nat_gateway_id          = module.lb.nat_gateway_id
-  allowed_cidrs           = [module.lb.security_group_id]
+  allowed_cidrs           = [module.lb.security_group_id, module.jenkins.security_group_id, module.consul_server[0].sg_id]
 }
 
 module "db" {
@@ -106,7 +106,7 @@ module "db" {
   key_pair          = aws_key_pair.jenkins-key-pair.key_name
   db_subnet_cidr    = "10.0.60.0/24"
   nat_gateway_id    = module.lb.nat_gateway_id
-  allowed_cidrs     = [module.web.security_group_id]
+  allowed_cidrs     = [module.web.security_group_id, module.jenkins.security_group_id, module.consul_server[0].sg_id]
 }
 
 # module "sonarqube" {
