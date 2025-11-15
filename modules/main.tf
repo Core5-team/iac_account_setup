@@ -1,4 +1,5 @@
 
+
 terraform {
   required_version = ">= 1.5.0"
 }
@@ -47,7 +48,7 @@ module "jenkins" {
   instance_type = "t3.medium"
   availability_zone = "eu-central-1a"
   subnet_cidr = "10.0.1.0/24"
-  user_data = file("${path.module}/install_jenkins.sh")
+  # user_data = file("${path.module}/install_jenkins.sh")
   count  = var.enable_jenkins ? 1 : 0
 
 }

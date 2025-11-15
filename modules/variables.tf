@@ -1,4 +1,5 @@
 
+
 variable "aws_region" {
   type        = string
   description = "AWS region to deploy resources"
@@ -23,6 +24,7 @@ variable "jenkins_ami_id" {
   default     = "ami-028a27dbcf0c459d5"
 }
 
+
 variable "enable_jenkins" {
   type        = bool
   description = "Deploy Jenkins module"
@@ -34,6 +36,7 @@ variable "enable_consul" {
   description = "Deploy Consul server module"
   default     = false
 }
+
 
 variable "role_arn" {
   type    = string
