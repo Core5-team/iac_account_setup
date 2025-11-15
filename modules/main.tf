@@ -38,6 +38,7 @@ module "sg" {
 
 module "iam_ssm" {
   source = "./modules/iam_ssm"
+  count  = var.enable_iam_ssm ? 1 : 0
 }
 
 module "consul_server" {
@@ -78,6 +79,7 @@ module "lb" {
   dns_name             = "birdwatching.pp.ua"
   public_subnet_cidr   = "10.0.50.0/24"
   iam_instance_profile = module.iam_ssm.ssm_instance_profile_name
+  count                = var.enable_lb ? 1 : 0
 }
 
 module "web" {
@@ -93,6 +95,7 @@ module "web" {
   private_web_subnet_cidr = "10.0.70.0/24"
   nat_gateway_id          = module.lb.nat_gateway_id
   allowed_cidrs           = [module.lb.security_group_id, module.jenkins.security_group_id, module.consul_server[0].sg_id]
+  count                   = var.enable_web ? 1 : 0
 }
 
 module "db" {
@@ -109,6 +112,7 @@ module "db" {
   nat_gateway_id       = module.lb.nat_gateway_id
   allowed_cidrs        = [module.web.security_group_id, module.jenkins.security_group_id, module.consul_server[0].sg_id]
   iam_instance_profile = module.iam_ssm.ssm_instance_profile_name
+  count                = var.enable_db ? 1 : 0
 }
 
 # module "sonarqube" {

@@ -37,6 +37,30 @@ variable "enable_consul" {
   default     = false
 }
 
+variable "enable_iam_ssm" {
+  type        = bool
+  description = "Deploy IAM for SSM module"
+  default     = false
+}
+
+variable "enable_lb" {
+  type        = bool
+  description = "Deploy loadbalancer module"
+  default     = false
+}
+
+variable "enable_web" {
+  type        = bool
+  description = "Deploy web servers module"
+  default     = false
+}
+
+variable "enable_db" {
+  type        = bool
+  description = "Deploy database module"
+  default     = false
+}
+
 
 variable "role_arn" {
   type    = string
