@@ -1,1 +1,15 @@
 **/*.tfstate
+
+.vscode/
+.idea/
+
+env/stage/.terraform/
+env/stage/.terraform.lock.hcl
+
+env/dev/.terraform/
+env/dev/.terraform.lock.hcl
+
+env/prod/.terraform/
+env/prod/.terraform.lock.hcl
+
+env/stage/install_jenkins.sh
