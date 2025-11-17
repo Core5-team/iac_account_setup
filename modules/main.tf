@@ -65,6 +65,32 @@ module "jenkins" {
   count             = var.enable_jenkins ? 1 : 0
 }
 
+
+module "eks" {
+  source            = "git::https://github.com/The-A-Team-organization/illuminati_eks.git?ref=main"
+
+  cluster_availability_zone_1 = var.cluster_availability_zone_1
+  cluster_availability_zone_2 = var.cluster_availability_zone_2
+  private_subnet_cidr_block_1 = var.private_subnet_cidr_block_1
+  private_subnet_cidr_block_2 = var.private_subnet_cidr_block_2
+  public_subnet_cidr_block_1  = var.public_subnet_cidr_block_1
+  public_subnet_cidr_block_2  = var.public_subnet_cidr_block_2
+
+  min_size     = var.min_size
+  max_size     = var.max_size
+  desired_size = var.desired_size
+
+  eks_cluster_name        = var.eks_cluster_name
+  environment_name        = var.environment_name
+  eks_cluster_k8s_version = var.eks_cluster_k8s_version
+
+  node_instance_types = var.node_instance_types
+
+  vpc_id                  = var.vpc_id
+  public_route_table_id   = var.public_route_table_id
+  region                  = var.aws_region
+}
+
 # module "lb" {
 #   source = "git::https://github.com/The-A-Team-organization/iac_birdwatching.git//modules/lb?ref=TAT-93-Refactor-and-Extend-Terraform-Configuration-From-Module-1-for-Birdwatching-Application-Infrastructure"
 #
