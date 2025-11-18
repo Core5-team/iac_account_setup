@@ -164,6 +164,6 @@ variable "public_route_table_id" {
 
 variable "env" {
   type        = string
-  description = "Enviroment to deploy resources"
+  description = "Environment to deploy resources"
   default     = "stage"
 }
