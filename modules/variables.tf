@@ -11,10 +11,22 @@ variable "available_zones_list" {
   default     = ["eu-central-1a", "eu-central-1b", "eu-central-1c"]
 }
 
+variable "availability_zone" {
+  type        = string
+  description = "Availability zone"
+  default     = "eu-central-1a"
+}
+
 variable "ami_id" {
   type        = string
   description = "AMI ID for instances"
   default     = "ami-0a5b0d219e493191b"
+}
+
+variable "birdwatching_dns_name" {
+  type        = string
+  description = "DNS name for birdwatching"
+  default     = "birdwatching.pp.ua"
 }
 
 variable "jenkins_ami_id" {
@@ -23,6 +35,11 @@ variable "jenkins_ami_id" {
   default     = "ami-0051c13afc17b19d8"
 }
 
+variable "birdwatching_ami_id" {
+  type        = string
+  description = "AMI ID for birdwatching instances"
+  default     = "ami-0a5b0d219e493191b"
+}
 
 variable "enable_jenkins" {
   type        = bool
@@ -36,31 +53,30 @@ variable "enable_consul" {
   default     = false
 }
 
-# variable "enable_iam_ssm" {
-#   type        = bool
-#   description = "Deploy IAM for SSM module"
-#   default     = false
-# }
-#
-# variable "enable_lb" {
-#   type        = bool
-#   description = "Deploy loadbalancer module"
-#   default     = false
-# }
-#
-# variable "enable_web" {
-#   type        = bool
-#   description = "Deploy web servers module"
-#   default     = false
-# }
-#
-# variable "enable_db" {
-#   type        = bool
-#   description = "Deploy database module"
-#   default     = false
-# }
 
+variable "enable_iam_ssm" {
+  type        = bool
+  description = "Deploy IAM for SSM module"
+  default     = false
+}
 
+variable "enable_lb" {
+  type        = bool
+  description = "Deploy loadbalancer module"
+  default     = false
+}
+
+variable "enable_web" {
+  type        = bool
+  description = "Deploy web servers module"
+  default     = false
+}
+
+variable "enable_db" {
+  type        = bool
+  description = "Deploy database module"
+  default     = false
+}
 
 variable "role_arn" {
   type    = string
@@ -136,7 +152,7 @@ variable "node_instance_types" {
   type        = list(string)
 }
 
-  variable "vpc_id" {
+variable "vpc_id" {
   description = "The id of vpc where our application will be deployed"
   type        = string
 }
@@ -144,4 +160,10 @@ variable "node_instance_types" {
 variable "public_route_table_id" {
   description = "The id of the public route table where our nat and elb will be deployed"
   type        = string
+}
+
+variable "env" {
+  type        = string
+  description = "Enviroment to deploy resources"
+  default     = "stage"
 }
