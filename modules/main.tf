@@ -14,16 +14,16 @@ provider "aws" {
   }
 }
 
-# resource "tls_private_key" "sskeygen-execution" {
-#   algorithm = "RSA"
-#   rsa_bits  = 4096
-# }
-#
-# resource "aws_key_pair" "jenkins-key-pair" {
-#   depends_on = ["tls_private_key.sskeygen-execution"]
-#   key_name   = "jenkins-public"
-#   public_key = tls_private_key.sskeygen-execution.public_key_openssh
-# }
+resource "tls_private_key" "sskeygen-execution" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "aws_key_pair" "jenkins-key-pair" {
+  depends_on = [tls_private_key.sskeygen-execution]
+  key_name   = "jenkins-public"
+  public_key = tls_private_key.sskeygen-execution.public_key_openssh
+}
 
 module "vpc" {
   source               = "./vpc"
@@ -36,10 +36,10 @@ module "sg" {
   main_vpc_id = module.vpc.vpc_id
 }
 
-# module "iam_ssm" {
-#   source = "./iam_ssm"
-#   count  = var.enable_iam_ssm ? 1 : 0
-# }
+module "iam_ssm" {
+  source = "./iam_ssm"
+  count  = var.enable_iam_ssm ? 1 : 0
+}
 
 module "consul_server" {
   source            = "./consul_server"
@@ -67,7 +67,7 @@ module "jenkins" {
 
 
 module "eks" {
-  source            = "git::https://github.com/The-A-Team-organization/illuminati_eks.git?ref=main"
+  source = "git::https://github.com/The-A-Team-organization/illuminati_eks.git?ref=main"
 
   cluster_availability_zone_1 = var.cluster_availability_zone_1
   cluster_availability_zone_2 = var.cluster_availability_zone_2
@@ -86,60 +86,64 @@ module "eks" {
 
   node_instance_types = var.node_instance_types
 
-  vpc_id                  = var.vpc_id
-  public_route_table_id   = var.public_route_table_id
-  region                  = var.aws_region
+  vpc_id                = var.vpc_id
+  public_route_table_id = var.public_route_table_id
+  region                = var.aws_region
 }
 
-# module "lb" {
-#   source = "git::https://github.com/The-A-Team-organization/iac_birdwatching.git//modules/lb?ref=TAT-93-Refactor-and-Extend-Terraform-Configuration-From-Module-1-for-Birdwatching-Application-Infrastructure"
-#
-#   vpc_id               = module.vpc.vpc_id
-#   igw_id               = module.vpc.internet_gateway_id
-#   availability_zone    = "eu-central-1a"
-#   common_tags          = { env = "stage" }
-#   env                  = "stage"
-#   ami                  = "ami-0a5b0d219e493191b"
-#   instance_type        = "t3.micro"
-#   key_name             = aws_key_pair.jenkins-key-pair.key_name
-#   dns_name             = "birdwatching.pp.ua"
-#   public_subnet_cidr   = "10.0.50.0/24"
-#   iam_instance_profile = module.iam_ssm.ssm_instance_profile_name
-#   count                = var.enable_lb ? 1 : 0
-# }
-#
-# module "web" {
-#   source = "git::https://github.com/The-A-Team-organization/iac_birdwatching.git//modules/web?ref=TAT-93-Refactor-and-Extend-Terraform-Configuration-From-Module-1-for-Birdwatching-Application-Infrastructure"
-#
-#   vpc_id                  = module.vpc.vpc_id
-#   availability_zone       = "eu-central-1a"
-#   common_tags             = { env = "stage" }
-#   env                     = "stage"
-#   ami                     = "ami-0a5b0d219e493191b"
-#   instance_type           = "t3.micro"
-#   key_name                = aws_key_pair.jenkins-key-pair.key_name
-#   private_web_subnet_cidr = "10.0.70.0/24"
-#   nat_gateway_id          = module.lb.nat_gateway_id
-#   allowed_cidrs           = [module.lb.security_group_id, module.jenkins.security_group_id, module.consul_server[0].sg_id]
-#   count                   = var.enable_web ? 1 : 0
-# }
-#
-# module "db" {
-#   source = "git::https://github.com/The-A-Team-organization/iac_birdwatching.git//modules/db?ref=TAT-93-Refactor-and-Extend-Terraform-Configuration-From-Module-1-for-Birdwatching-Application-Infrastructure"
-#
-#   vpc_id               = module.vpc.vpc_id
-#   availability_zone    = "eu-central-1a"
-#   common_tags          = { env = "stage" }
-#   env                  = "stage"
-#   ami                  = "ami-0a5b0d219e493191b"
-#   instance_type        = "t3.micro"
-#   key_pair             = aws_key_pair.jenkins-key-pair.key_name
-#   db_subnet_cidr       = "10.0.60.0/24"
-#   nat_gateway_id       = module.lb.nat_gateway_id
-#   allowed_cidrs        = [module.web.security_group_id, module.jenkins.security_group_id, module.consul_server[0].sg_id]
-#   iam_instance_profile = module.iam_ssm.ssm_instance_profile_name
-#   count                = var.enable_db ? 1 : 0
-# }
+
+module "lb" {
+  source               = "git::https://github.com/The-A-Team-organization/iac_birdwatching.git//modules/lb?ref=main"
+  vpc_id               = module.vpc.vpc_id
+  igw_id               = module.vpc.internet_gateway_id
+  availability_zone    = var.availability_zone
+  common_tags          = { env = "stage" }
+  env                  = var.env
+  ami                  = var.birdwatching_ami_id
+  instance_type        = "t3.micro"
+  key_name             = aws_key_pair.jenkins-key-pair.key_name
+  dns_name             = var.birdwatching_dns_name
+  public_subnet_cidr   = "10.0.3.0/24"
+  iam_instance_profile = module.iam_ssm[0].ssm_instance_profile_name
+  count                = var.enable_lb ? 1 : 0
+}
+
+module "web" {
+  source                  = "git::https://github.com/The-A-Team-organization/iac_birdwatching.git//modules/web?ref=main"
+  vpc_id                  = module.vpc.vpc_id
+  availability_zone       = var.availability_zone
+  common_tags             = { env = "stage" }
+  env                     = var.env
+  ami                     = var.birdwatching_ami_id
+  instance_type           = "t3.micro"
+  key_name                = aws_key_pair.jenkins-key-pair.key_name
+  private_web_subnet_cidr = "10.0.4.0/24"
+  nat_gateway_id          = module.lb[0].nat_gateway_id
+  allowed_cidrs = [
+    module.lb[0].security_group_id,
+    module.sg.sg_id
+  ]
+  count = var.enable_web ? 1 : 0
+}
+
+module "db" {
+  source            = "git::https://github.com/The-A-Team-organization/iac_birdwatching.git//modules/db?ref=main"
+  vpc_id            = module.vpc.vpc_id
+  availability_zone = var.availability_zone
+  common_tags       = { env = "stage" }
+  env               = var.env
+  ami               = var.birdwatching_ami_id
+  instance_type     = "t3.micro"
+  key_pair          = aws_key_pair.jenkins-key-pair.key_name
+  db_subnet_cidr    = "10.0.5.0/24"
+  nat_gateway_id    = module.lb[0].nat_gateway_id
+  allowed_cidrs = [
+    module.web[0].security_group_id,
+    module.sg.sg_id
+  ]
+  iam_instance_profile = module.iam_ssm[0].ssm_instance_profile_name
+  count                = var.enable_db ? 1 : 0
+}
 
 # module "sonarqube" {
 #   source = "url"
