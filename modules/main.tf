@@ -42,15 +42,23 @@ module "iam_ssm" {
 }
 
 module "consul_server" {
-  source            = "./consul_server"
-  ami_id            = var.ami_id
-  main_vpc_id       = module.vpc.vpc_id
-  sg_id             = module.sg.sg_id
-  aws_region        = var.aws_region
-  private_subnet_id = module.vpc.private_subnet_ids[0]
-  count             = var.enable_consul ? 1 : 0
+  source               = "./consul_server"
+  env                  = var.env
+  vpc_id               = module.vpc.vpc_id
+  aws_region           = var.aws_region
+  availability_zone    = var.availability_zone
+  ami_id               = var.ami_id
+  instance_type        = "t3.micro"
+  key_pair             = aws_key_pair.jenkins-key-pair.key_name
+  private_subnet_cidr  = "10.0.9.0/24"
+  nat_gateway_id       = module.lb[0].nat_gateway_id
+  allowed_cidrs        = ["10.0.0.0/16"]
+  iam_instance_profile = module.iam_ssm[0].ssm_instance_profile_name
+  common_tags          = { env = var.env }
+  route53_zone_name    = "consul.internal"
+  consul_record_name   = "consul.internal"
+  count                = var.enable_consul ? 1 : 0
 }
-
 
 module "jenkins" {
   source            = "git::https://github.com/The-A-Team-organization/iac_core.git//modules/jenkins?ref=TAT-86-Create-Stage-Infrastructure-Terraform-Jenkins-ECR-SonarQube-IAM-Cross-Account-Policies"
@@ -120,6 +128,7 @@ module "web" {
   nat_gateway_id          = module.lb[0].nat_gateway_id
   allowed_cidrs = [
     module.lb[0].security_group_id,
+    module.consul_server[0].consul_server_security_group_id,
     module.sg.sg_id
   ]
   count = var.enable_web ? 1 : 0
@@ -138,6 +147,7 @@ module "db" {
   nat_gateway_id    = module.lb[0].nat_gateway_id
   allowed_cidrs = [
     module.web[0].security_group_id,
+    module.consul_server[0].consul_server_security_group_id,
     module.sg.sg_id
   ]
   iam_instance_profile = module.iam_ssm[0].ssm_instance_profile_name
@@ -159,6 +169,7 @@ module "monitoring" {
     module.lb[0].security_group_id,
     module.web[0].security_group_id,
     module.db[0].db_security_group_id,
+    module.consul_server[0].consul_server_security_group_id,
     module.sg.sg_id,
   ]
   iam_instance_profile = module.iam_ssm[0].ssm_instance_profile_name
