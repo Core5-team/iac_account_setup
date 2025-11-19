@@ -119,7 +119,6 @@ module "web" {
   private_web_subnet_cidr = "10.0.4.0/24"
   nat_gateway_id          = module.lb[0].nat_gateway_id
   allowed_cidrs = [
-    module.monitoring[0].security_group_id,
     module.lb[0].security_group_id,
     module.sg.sg_id
   ]
@@ -138,7 +137,6 @@ module "db" {
   db_subnet_cidr    = "10.0.5.0/24"
   nat_gateway_id    = module.lb[0].nat_gateway_id
   allowed_cidrs = [
-    module.monitoring[0].security_group_id,
     module.web[0].security_group_id,
     module.sg.sg_id
   ]
