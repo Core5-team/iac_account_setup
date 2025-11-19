@@ -47,7 +47,7 @@ module "consul_server" {
   vpc_id               = module.vpc.vpc_id
   aws_region           = var.aws_region
   availability_zone    = var.availability_zone
-  ami_id               = var.ami_id
+  ami_id               = var.birdwatching_ami_id
   instance_type        = "t3.micro"
   key_pair             = aws_key_pair.jenkins-key-pair.key_name
   private_subnet_cidr  = "10.0.9.0/24"
