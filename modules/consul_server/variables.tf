@@ -48,7 +48,7 @@ variable "nat_gateway_id" {
 }
 
 variable "allowed_cidrs" {
-  type        = string
+  type        = list(string)
   description = "CIDRs allowed to access consul service ports"
   default     = ["10.0.0.0/16"]
 }

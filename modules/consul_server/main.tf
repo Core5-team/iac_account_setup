@@ -33,42 +33,42 @@ resource "aws_security_group" "consul_sg" {
     from_port   = 8300
     to_port     = 8302
     protocol    = "tcp"
-    cidr_blocks = [var.allowed_cidrs]
+    cidr_blocks = var.allowed_cidrs
   }
 
   ingress {
     from_port   = 8300
     to_port     = 8302
     protocol    = "udp"
-    cidr_blocks = [var.allowed_cidrs]
+    cidr_blocks = var.allowed_cidrs
   }
 
   ingress {
     from_port   = 8500
     to_port     = 8500
     protocol    = "tcp"
-    cidr_blocks = [var.allowed_cidrs]
+    cidr_blocks = var.allowed_cidrs
   }
 
   ingress {
     from_port   = 8600
     to_port     = 8600
     protocol    = "tcp"
-    cidr_blocks = [var.allowed_cidrs]
+    cidr_blocks = var.allowed_cidrs
   }
 
   ingress {
     from_port   = 8600
     to_port     = 8600
     protocol    = "udp"
-    cidr_blocks = [var.allowed_cidrs]
+    cidr_blocks = var.allowed_cidrs
   }
 
   ingress {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = [var.allowed_cidrs]
+    cidr_blocks = var.allowed_cidrs
 
   }
 
