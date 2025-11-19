@@ -120,6 +120,7 @@ module "web" {
   private_web_subnet_cidr = "10.0.4.0/24"
   nat_gateway_id          = module.lb[0].nat_gateway_id
   allowed_cidrs = [
+    module.monitoring[0].security_group_id,
     module.lb[0].security_group_id,
     module.sg.sg_id
   ]
@@ -138,11 +139,33 @@ module "db" {
   db_subnet_cidr    = "10.0.5.0/24"
   nat_gateway_id    = module.lb[0].nat_gateway_id
   allowed_cidrs = [
+    module.monitoring[0].security_group_id,
     module.web[0].security_group_id,
     module.sg.sg_id
   ]
   iam_instance_profile = module.iam_ssm[0].ssm_instance_profile_name
   count                = var.enable_db ? 1 : 0
+}
+
+module "monitoring" {
+  source              = "./monitoring_server"
+  vpc_id              = module.vpc.vpc_id
+  availability_zone   = var.availability_zone
+  common_tags         = { env = var.env }
+  env                 = var.env
+  ami                 = var.birdwatching_ami_id
+  instance_type       = "c7i-flex.large"
+  key_pair            = aws_key_pair.jenkins-key-pair.key_name
+  private_subnet_cidr = "10.0.8.0/24"
+  nat_gateway_id      = module.lb[0].nat_gateway_id
+  allowed_cidrs = [
+    module.lb[0].security_group_id,
+    module.web[0].security_group_id,
+    module.db[0].security_group_id,
+    module.sg.sg_id,
+  ]
+  iam_instance_profile = module.iam_ssm[0].ssm_instance_profile_name
+  count                = var.enable_monitoring ? 1 : 0
 }
 
 # module "sonarqube" {

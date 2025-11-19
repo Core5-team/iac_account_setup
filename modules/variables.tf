@@ -78,6 +78,12 @@ variable "enable_db" {
   default     = false
 }
 
+variable "enable_monitoring" {
+  type        = bool
+  description = "Deploy monitoring_instance module"
+  default     = false
+}
+
 variable "role_arn" {
   type    = string
   default = null
