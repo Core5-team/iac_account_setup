@@ -158,7 +158,7 @@ module "monitoring" {
   allowed_cidrs = [
     module.lb[0].security_group_id,
     module.web[0].security_group_id,
-    module.db[0].security_group_id,
+    module.db[0].db_security_group_id,
     module.sg.sg_id,
   ]
   iam_instance_profile = module.iam_ssm[0].ssm_instance_profile_name
