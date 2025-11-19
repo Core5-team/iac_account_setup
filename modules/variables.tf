@@ -14,7 +14,7 @@ variable "available_zones_list" {
 variable "availability_zone" {
   type        = string
   description = "Availability zone"
-  default     = "eu-central-1a"
+  default     = "eu-central-1c"
 }
 
 variable "ami_id" {
