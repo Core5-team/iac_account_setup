@@ -155,7 +155,7 @@ module "db" {
 }
 
 module "images_bucket" {
-  source      = "git::https://github.com/The-A-Team-organization/iac_birdwatching.git//modules/s3_images?ref=TAT-104-Create-Main-Monitoring-Instance-with-Prometheus-Grafana-Loki-and-Access-for-Additional-Instances-Grafana-Alloy-Compatible"
+  source      = "git::https://github.com/The-A-Team-organization/iac_birdwatching.git//modules/s3_images?ref=main"
   env         = var.env
   project     = "birdwatching"
   common_tags = { env = var.env }
