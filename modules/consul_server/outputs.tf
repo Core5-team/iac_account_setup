@@ -22,9 +22,3 @@ output "consul_server_volume_id" {
   description = "Attached EBS volume ID"
   value       = aws_ebs_volume.consul_volume.id
 }
-
-output "consul_route53_zone_id" {
-  description = "Private Route53 zone id for consul"
-  value       = aws_route53_zone.consul_internal.zone_id
-}
-

@@ -45,7 +45,6 @@ module "consul_server" {
   source               = "./consul_server"
   env                  = var.env
   vpc_id               = module.vpc.vpc_id
-  aws_region           = var.aws_region
   availability_zone    = var.availability_zone
   ami_id               = var.birdwatching_ami_id
   instance_type        = "t3.micro"
@@ -55,8 +54,6 @@ module "consul_server" {
   allowed_cidrs        = ["10.0.0.0/16"]
   iam_instance_profile = module.iam_ssm[0].ssm_instance_profile_name
   common_tags          = { env = var.env }
-  route53_zone_name    = "consul.internal"
-  consul_record_name   = "consul.internal"
   count                = var.enable_consul ? 1 : 0
 }
 
