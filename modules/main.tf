@@ -42,15 +42,23 @@ module "iam_ssm" {
 }
 
 module "consul_server" {
-  source            = "./consul_server"
-  ami_id            = var.ami_id
-  main_vpc_id       = module.vpc.vpc_id
-  sg_id             = module.sg.sg_id
-  aws_region        = var.aws_region
-  private_subnet_id = module.vpc.private_subnet_ids[0]
-  count             = var.enable_consul ? 1 : 0
+  source               = "./consul_server"
+  env                  = var.env
+  vpc_id               = module.vpc.vpc_id
+  aws_region           = var.aws_region
+  availability_zone    = var.availability_zone
+  ami_id               = var.birdwatching_ami_id
+  instance_type        = "t3.micro"
+  key_pair             = aws_key_pair.jenkins-key-pair.key_name
+  private_subnet_cidr  = "10.0.9.0/24"
+  nat_gateway_id       = module.lb[0].nat_gateway_id
+  allowed_cidrs        = ["10.0.0.0/16"]
+  iam_instance_profile = module.iam_ssm[0].ssm_instance_profile_name
+  common_tags          = { env = var.env }
+  route53_zone_name    = "consul.internal"
+  consul_record_name   = "consul.internal"
+  count                = var.enable_consul ? 1 : 0
 }
-
 
 module "jenkins" {
   source            = "git::https://github.com/The-A-Team-organization/iac_core.git//modules/jenkins?ref=TAT-86-Create-Stage-Infrastructure-Terraform-Jenkins-ECR-SonarQube-IAM-Cross-Account-Policies"
@@ -66,31 +74,30 @@ module "jenkins" {
 }
 
 
-module "eks" {
-  source = "git::https://github.com/The-A-Team-organization/illuminati_eks.git?ref=main"
+#module "eks" {
+#  source = "git::https://github.com/The-A-Team-organization/illuminati_eks.git?ref=main"
+#
+# cluster_availability_zone_1 = var.cluster_availability_zone_1
+#  cluster_availability_zone_2 = var.cluster_availability_zone_2
+#  private_subnet_cidr_block_1 = var.private_subnet_cidr_block_1
+#  private_subnet_cidr_block_2 = var.private_subnet_cidr_block_2
+#  public_subnet_cidr_block_1  = var.public_subnet_cidr_block_1
+#  public_subnet_cidr_block_2  = var.public_subnet_cidr_block_2
+#
+#  min_size     = var.min_size
+#  max_size     = var.max_size
+#desired_size = var.desired_size
 
-  cluster_availability_zone_1 = var.cluster_availability_zone_1
-  cluster_availability_zone_2 = var.cluster_availability_zone_2
-  private_subnet_cidr_block_1 = var.private_subnet_cidr_block_1
-  private_subnet_cidr_block_2 = var.private_subnet_cidr_block_2
-  public_subnet_cidr_block_1  = var.public_subnet_cidr_block_1
-  public_subnet_cidr_block_2  = var.public_subnet_cidr_block_2
+# eks_cluster_name        = var.eks_cluster_name
+#environment_name        = var.environment_name
+#eks_cluster_k8s_version = var.eks_cluster_k8s_version
 
-  min_size     = var.min_size
-  max_size     = var.max_size
-  desired_size = var.desired_size
-
-  eks_cluster_name        = var.eks_cluster_name
-  environment_name        = var.environment_name
-  eks_cluster_k8s_version = var.eks_cluster_k8s_version
-
-  node_instance_types = var.node_instance_types
-
-  vpc_id                = var.vpc_id
-  public_route_table_id = var.public_route_table_id
-  region                = var.aws_region
-}
-
+#  node_instance_types = var.node_instance_types
+#
+#vpc_id                = var.vpc_id
+#public_route_table_id = var.public_route_table_id
+#region                = var.aws_region
+#}
 
 module "lb" {
   source               = "git::https://github.com/The-A-Team-organization/iac_birdwatching.git//modules/lb?ref=main"
@@ -121,6 +128,7 @@ module "web" {
   nat_gateway_id          = module.lb[0].nat_gateway_id
   allowed_cidrs = [
     module.lb[0].security_group_id,
+    module.consul_server[0].consul_server_security_group_id,
     module.sg.sg_id
   ]
   count = var.enable_web ? 1 : 0
@@ -139,10 +147,40 @@ module "db" {
   nat_gateway_id    = module.lb[0].nat_gateway_id
   allowed_cidrs = [
     module.web[0].security_group_id,
+    module.consul_server[0].consul_server_security_group_id,
     module.sg.sg_id
   ]
   iam_instance_profile = module.iam_ssm[0].ssm_instance_profile_name
   count                = var.enable_db ? 1 : 0
+}
+
+module "images_bucket" {
+  source      = "git::https://github.com/The-A-Team-organization/iac_birdwatching.git//modules/s3_images?ref=main"
+  env         = var.env
+  project     = "birdwatching"
+  common_tags = { env = var.env }
+}
+
+module "monitoring" {
+  source              = "./monitoring_server"
+  vpc_id              = module.vpc.vpc_id
+  availability_zone   = var.availability_zone
+  common_tags         = { env = var.env }
+  env                 = var.env
+  ami                 = var.birdwatching_ami_id
+  instance_type       = "c7i-flex.large"
+  key_pair            = aws_key_pair.jenkins-key-pair.key_name
+  private_subnet_cidr = "10.0.8.0/24"
+  nat_gateway_id      = module.lb[0].nat_gateway_id
+  allowed_cidrs = [
+    module.lb[0].security_group_id,
+    module.web[0].security_group_id,
+    module.db[0].db_security_group_id,
+    module.consul_server[0].consul_server_security_group_id,
+    module.sg.sg_id,
+  ]
+  iam_instance_profile = module.iam_ssm[0].ssm_instance_profile_name
+  count                = var.enable_monitoring ? 1 : 0
 }
 
 # module "sonarqube" {
