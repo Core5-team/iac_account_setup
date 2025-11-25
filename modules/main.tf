@@ -14,6 +14,10 @@ provider "aws" {
   }
 }
 
+resource "aws_ecr_repository" "repos" {
+  name = "front_stage"
+}
+
 resource "tls_private_key" "sskeygen-execution" {
   algorithm = "RSA"
   rsa_bits  = 4096
