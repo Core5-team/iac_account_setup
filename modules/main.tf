@@ -58,7 +58,7 @@ module "consul_server" {
 }
 
 module "jenkins" {
- source            = "git::https://github.com/Core5-team/iac_core.git/modules/jenkins?ref=CORE5-14-change-tags-in-iac-core"
+ source            = "git::https://github.com/Core5-team/iac_core.git//modules/jenkins?ref=CORE5-14-change-tags-in-iac-core"
   region            = var.aws_region
   vpc_id            = module.vpc.vpc_id
   igw_id            = module.vpc.internet_gateway_id
