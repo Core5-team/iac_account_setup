@@ -63,7 +63,7 @@ module "jenkins" {
   vpc_id            = module.vpc.vpc_id
   igw_id            = module.vpc.internet_gateway_id
   env               = "stage_01"
-  ami               = var.ami_id
+  ami               = var.jenkins_ami_id
   instance_type     = "c7i-flex.large"
   availability_zone = "us-east-1a"
   subnet_cidr       = "10.0.1.0/24"
