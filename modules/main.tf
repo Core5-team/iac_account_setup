@@ -62,7 +62,7 @@ module "jenkins" {
   region            = var.aws_region
   vpc_id            = module.vpc.vpc_id
   igw_id            = module.vpc.internet_gateway_id
-  env               = "stage-01"
+  env               = "stage_01"
   ami               = var.ami_id
   instance_type     = "c7i-flex.large"
   availability_zone = "us-east-1a"
