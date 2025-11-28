@@ -109,24 +109,3 @@ resource "aws_volume_attachment" "consul_volume_attachment" {
   instance_id  = aws_instance.consul_server.id
   force_detach = true
 }
-
-resource "aws_route53_zone" "consul_internal" {
-  name = var.route53_zone_name
-
-  vpc {
-    vpc_id     = var.vpc_id
-    vpc_region = var.aws_region
-  }
-
-  comment = "Private zone for consul services"
-  tags    = var.common_tags
-}
-
-resource "aws_route53_record" "consul_record" {
-  zone_id = aws_route53_zone.consul_internal.zone_id
-  name    = var.consul_record_name
-  type    = "A"
-  ttl     = var.route53_ttl
-  records = [aws_instance.consul_server.private_ip]
-}
-

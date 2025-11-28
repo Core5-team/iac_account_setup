@@ -8,11 +8,6 @@ variable "vpc_id" {
   description = "VPC ID"
 }
 
-variable "aws_region" {
-  type        = string
-  description = "AWS region where the VPC exists"
-}
-
 variable "availability_zone" {
   type        = string
   description = "Availability zone"
@@ -81,23 +76,5 @@ variable "common_tags" {
   type        = map(string)
   description = "Common tags"
   default     = {}
-}
-
-variable "route53_zone_name" {
-  type        = string
-  description = "Private Route53 zone name"
-  default     = "consul.internal"
-}
-
-variable "consul_record_name" {
-  type        = string
-  description = "A record name for the consul server inside private zone"
-  default     = "consul.internal"
-}
-
-variable "route53_ttl" {
-  type        = number
-  description = "TTL for route53 record"
-  default     = 300
 }
 
