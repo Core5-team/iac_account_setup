@@ -97,7 +97,7 @@ module "jenkins" {
 #}
 
 module "lb" {
-  source               = "git::https://github.com/The-A-Team-organization/iac_birdwatching.git//modules/lb?ref=main"
+  source               = "git::https://github.com/Core5-team/iac_birdwatching.git//modules/lb?ref=main"
   vpc_id               = module.vpc.vpc_id
   igw_id               = module.vpc.internet_gateway_id
   availability_zone    = var.availability_zone
@@ -113,7 +113,7 @@ module "lb" {
 }
 
 module "web" {
-  source                  = "git::https://github.com/The-A-Team-organization/iac_birdwatching.git//modules/web?ref=main"
+  source                  = "git::https://github.com/Core5-team/iac_birdwatching.git//modules/web?ref=main"
   vpc_id                  = module.vpc.vpc_id
   availability_zone       = var.availability_zone
   common_tags             = { env = "stage" }
@@ -132,7 +132,7 @@ module "web" {
 }
 
 module "db" {
-  source            = "git::https://github.com/The-A-Team-organization/iac_birdwatching.git//modules/db?ref=main"
+  source            = "git::https://github.com/Core5-team/iac_birdwatching.git//modules/db?ref=main"
   vpc_id            = module.vpc.vpc_id
   availability_zone = var.availability_zone
   common_tags       = { env = "stage" }
@@ -152,7 +152,7 @@ module "db" {
 }
 
 module "images_bucket" {
-  source      = "git::https://github.com/The-A-Team-organization/iac_birdwatching.git//modules/s3_images?ref=main"
+  source      = "git::https://github.com/Core5-team/iac_birdwatching.git//modules/s3_images?ref=main"
   env         = var.env
   project     = "birdwatching"
   common_tags = { env = var.env }
