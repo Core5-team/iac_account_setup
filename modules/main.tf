@@ -58,14 +58,14 @@ module "consul_server" {
 }
 
 module "jenkins" {
-  source            = "git::https://github.com/The-A-Team-organization/iac_core.git//modules/jenkins?ref=TAT-86-Create-Stage-Infrastructure-Terraform-Jenkins-ECR-SonarQube-IAM-Cross-Account-Policies"
+ source            = "git::https://github.com/Core5-team/iac_core.git/modules/jenkins?ref=CORE5-14-change-tags-in-iac-core"
   region            = var.aws_region
   vpc_id            = module.vpc.vpc_id
   igw_id            = module.vpc.internet_gateway_id
-  env               = "stage"
-  ami               = var.jenkins_ami_id
-  instance_type     = "t3.medium"
-  availability_zone = "eu-central-1a"
+  env               = "stage-01"
+  ami               = var.ami_id
+  instance_type     = "c7i-flex.large"
+  availability_zone = "us-east-1a"
   subnet_cidr       = "10.0.1.0/24"
   count             = var.enable_jenkins ? 1 : 0
 }
