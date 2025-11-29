@@ -28,6 +28,7 @@ resource "aws_key_pair" "jenkins-key-pair" {
 module "vpc" {
   source               = "./vpc"
   available_zones_list = var.available_zones_list
+count                = var.enable_consul ? 1 : 0
 }
 
 
@@ -152,7 +153,7 @@ module "db" {
 }
 
 module "images_bucket" {
-  source      = "git::https://github.com/Core5-team/iac_birdwatching.git//modules/s3_images?ref=main"
+  source      = "git::https://github.com/Core5-team/iac_birdwatching.git//modules/s3_images?ref=CORE5-16-change-_-to-in-s3-bucket-name"
   env         = var.env
   project     = "birdwatching"
   common_tags = { env = var.env }
