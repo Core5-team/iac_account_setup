@@ -48,7 +48,7 @@ module "consul_server" {
   availability_zone    = var.availability_zone
   ami_id               = var.birdwatching_ami_id
   instance_type        = "t3.micro"
-  key_pair             = aws_key_pair.jenkins-key-pair.key_name
+  # key_pair             = aws_key_pair.jenkins-key-pair.key_name
   private_subnet_cidr  = "10.0.9.0/24"
   nat_gateway_id       = module.lb[0].nat_gateway_id
   allowed_cidrs        = ["10.0.0.0/16"]

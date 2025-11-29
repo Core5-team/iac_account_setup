@@ -24,11 +24,11 @@ variable "instance_type" {
   default     = "t3.micro"
 }
 
-variable "key_pair" {
-  type        = string
-  description = "SSH key pair name"
-  default     = null
-}
+# variable "key_pair" {
+#   type        = string
+#   description = "SSH key pair name"
+#   default     = null
+# }
 
 variable "private_subnet_cidr" {
   type        = string
