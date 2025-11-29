@@ -28,7 +28,6 @@ resource "aws_key_pair" "jenkins-key-pair" {
 module "vpc" {
   source               = "./vpc"
   available_zones_list = var.available_zones_list
-count                = var.enable_consul ? 1 : 0
 }
 
 
