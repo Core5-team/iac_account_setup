@@ -173,3 +173,27 @@ variable "env" {
   description = "Environment to deploy resources"
   default     = "stage"
 }
+
+variable "create_vpc" {
+  type        = bool
+  description = "Whether the module should create its own VPC"
+  default     = false
+}
+
+variable "vpc_id" {
+  type        = string
+  description = "Use existing VPC ID when enable_vpc = false"
+  default     = null
+}
+
+variable "igw_id" {
+  type        = string
+  description = "Use existing Internet Gateway ID when enable_vpc = false"
+  default     = null
+}
+
+variable "key_pair" {
+  type        = string
+  description = "SSH key pair name"
+  default     = null
+}

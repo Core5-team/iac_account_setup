@@ -91,10 +91,10 @@ resource "aws_ebs_volume" "consul_volume" {
 }
 
 resource "aws_instance" "consul_server" {
-  ami                         = var.ami_id
-  instance_type               = var.instance_type
-  subnet_id                   = aws_subnet.consul_subnet.id
-  vpc_security_group_ids      = [aws_security_group.consul_sg.id]
+  ami                    = var.ami_id
+  instance_type          = var.instance_type
+  subnet_id              = aws_subnet.consul_subnet.id
+  vpc_security_group_ids = [aws_security_group.consul_sg.id]
   # key_name                    = var.key_pair
   iam_instance_profile        = var.iam_instance_profile
   associate_public_ip_address = false
