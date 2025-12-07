@@ -59,7 +59,7 @@ module "consul_server" {
   instance_type        = "t3.micro"
   key_pair             = local.key_pair_final
   private_subnet_cidr  = "10.0.9.0/24"
-  nat_gateway_id       = module.lb[0].nat_gateway_id
+  nat_gateway_id       = var.nat_id 
   allowed_cidrs        = ["10.0.0.0/16"]
   iam_instance_profile = module.iam_ssm[0].ssm_instance_profile_name
   common_tags          = { env = var.env }
@@ -106,9 +106,10 @@ module "jenkins" {
 #}
 
 module "lb" {
-  source               = "git::https://github.com/Core5-team/iac_birdwatching.git//modules/lb?ref=main"
+  source               = "git::https://github.com/Core5-team/iac_birdwatching.git//modules/lb?ref=CORE5-16-change-_-to-in-s3-bucket-name"
   vpc_id               = local.vpc_id_final
   igw_id               = local.igw_id_final
+  public_rt_id       = var.public_rt_id
   availability_zone    = var.availability_zone
   common_tags          = { env = "stage" }
   env                  = var.env
@@ -122,7 +123,7 @@ module "lb" {
 }
 
 module "web" {
-  source                  = "git::https://github.com/Core5-team/iac_birdwatching.git//modules/web?ref=main"
+  source      = "git::https://github.com/Core5-team/iac_birdwatching.git//modules/s3_images?ref=CORE5-16-change-_-to-in-s3-bucket-name"
   vpc_id                  = local.vpc_id_final
   availability_zone       = var.availability_zone
   common_tags             = { env = "stage" }
@@ -131,7 +132,7 @@ module "web" {
   instance_type           = "t3.micro"
   key_name                = local.key_pair_final
   private_web_subnet_cidr = "10.0.4.0/24"
-  nat_gateway_id          = module.lb[0].nat_gateway_id
+  nat_gateway_id       = var.nat_id 
   allowed_cidrs = [
     module.lb[0].security_group_id,
     module.consul_server[0].consul_server_security_group_id,
@@ -141,7 +142,7 @@ module "web" {
 }
 
 module "db" {
-  source            = "git::https://github.com/Core5-team/iac_birdwatching.git//modules/db?ref=main"
+  source      = "git::https://github.com/Core5-team/iac_birdwatching.git//modules/s3_images?ref=CORE5-16-change-_-to-in-s3-bucket-name"
   vpc_id            = local.vpc_id_final
   availability_zone = var.availability_zone
   common_tags       = { env = "stage" }
@@ -150,7 +151,7 @@ module "db" {
   instance_type     = "t3.micro"
   key_pair          = local.key_pair_final
   db_subnet_cidr    = "10.0.5.0/24"
-  nat_gateway_id    = module.lb[0].nat_gateway_id
+  nat_gateway_id       = var.nat_id 
   allowed_cidrs = [
     module.web[0].security_group_id,
     module.consul_server[0].consul_server_security_group_id,
@@ -177,7 +178,7 @@ module "monitoring" {
   instance_type       = "c7i-flex.large"
   key_pair            = local.key_pair_final
   private_subnet_cidr = "10.0.8.0/24"
-  nat_gateway_id      = module.lb[0].nat_gateway_id
+  nat_gateway_id       = var.nat_id 
   allowed_cidrs = [
     module.lb[0].security_group_id,
     module.web[0].security_group_id,

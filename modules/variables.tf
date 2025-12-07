@@ -197,3 +197,15 @@ variable "key_pair" {
   description = "SSH key pair name"
   default     = null
 }
+
+variable "nat_id" {
+  type        = string
+  description = "Use existing NAT Gateway ID "
+  default     = null
+}
+
+variable "public_rt_id" {
+  type        = string
+  description = "Use existing Public Route Table ID "
+  default     = null
+}
