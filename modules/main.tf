@@ -123,7 +123,7 @@ module "lb" {
 }
 
 module "web" {
-  source      = "git::https://github.com/Core5-team/iac_birdwatching.git//modules/s3_images?ref=CORE5-16-change-_-to-in-s3-bucket-name"
+  source      = "git::https://github.com/Core5-team/iac_birdwatching.git//modules/web?ref=CORE5-16-change-_-to-in-s3-bucket-name"
   vpc_id                  = local.vpc_id_final
   availability_zone       = var.availability_zone
   common_tags             = { env = "stage" }
@@ -142,7 +142,7 @@ module "web" {
 }
 
 module "db" {
-  source      = "git::https://github.com/Core5-team/iac_birdwatching.git//modules/s3_images?ref=CORE5-16-change-_-to-in-s3-bucket-name"
+  source      = "git::https://github.com/Core5-team/iac_birdwatching.git//modules/db?ref=CORE5-16-change-_-to-in-s3-bucket-name"
   vpc_id            = local.vpc_id_final
   availability_zone = var.availability_zone
   common_tags       = { env = "stage" }
