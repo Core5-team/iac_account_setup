@@ -80,31 +80,6 @@ module "jenkins" {
 }
 
 
-#module "eks" {
-#  source = "git::https://github.com/The-A-Team-organization/illuminati_eks.git?ref=main"
-#
-# cluster_availability_zone_1 = var.cluster_availability_zone_1
-#  cluster_availability_zone_2 = var.cluster_availability_zone_2
-#  private_subnet_cidr_block_1 = var.private_subnet_cidr_block_1
-#  private_subnet_cidr_block_2 = var.private_subnet_cidr_block_2
-#  public_subnet_cidr_block_1  = var.public_subnet_cidr_block_1
-#  public_subnet_cidr_block_2  = var.public_subnet_cidr_block_2
-#
-#  min_size     = var.min_size
-#  max_size     = var.max_size
-#desired_size = var.desired_size
-
-# eks_cluster_name        = var.eks_cluster_name
-#environment_name        = var.environment_name
-#eks_cluster_k8s_version = var.eks_cluster_k8s_version
-
-#  node_instance_types = var.node_instance_types
-#
-#vpc_id                = var.vpc_id
-#public_route_table_id = var.public_route_table_id
-#region                = var.aws_region
-#}
-
 module "lb" {
   source               = "git::https://github.com/Core5-team/iac_birdwatching.git//modules/lb?ref=CORE5-16-change-_-to-in-s3-bucket-name"
   vpc_id               = local.vpc_id_final
@@ -190,9 +165,3 @@ module "monitoring" {
   count                = var.enable_monitoring ? 1 : 0
 }
 
-# module "sonarqube" {
-#   source = "url"
-#   vpc_id = module.vpc.vpc_id
-#   sg_id  = module.sg.sg_id
-#   count  = var.enable_sonarqube ? 1 : 0
-# }
