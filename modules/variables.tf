@@ -2,19 +2,19 @@
 variable "aws_region" {
   type        = string
   description = "AWS region to deploy resources"
-  default     = "eu-central-1"
+  default     = "us-east-1"
 }
 
 variable "available_zones_list" {
   type        = list(string)
   description = "List of availability zones"
-  default     = ["eu-central-1a", "eu-central-1b", "eu-central-1c"]
+  default     = ["us-east-1a", "us-east-1b", "us-east-1c"]
 }
 
 variable "availability_zone" {
   type        = string
   description = "Availability zone"
-  default     = "eu-central-1c"
+  default     = "us-east-1c"
 }
 
 variable "ami_id" {
@@ -32,7 +32,7 @@ variable "birdwatching_dns_name" {
 variable "jenkins_ami_id" {
   type        = string
   description = "AMI ID for Jenkins EC2 instance"
-  default     = "ami-0051c13afc17b19d8"
+  default     = "ami-0c5b6ddef5dedc1fd"
 }
 
 variable "birdwatching_ami_id" {
@@ -172,4 +172,40 @@ variable "env" {
   type        = string
   description = "Environment to deploy resources"
   default     = "stage"
+}
+
+variable "create_vpc" {
+  type        = bool
+  description = "Whether the module should create its own VPC"
+  default     = false
+}
+
+variable "vpc_id" {
+  type        = string
+  description = "Use existing VPC ID when enable_vpc = false"
+  default     = null
+}
+
+variable "igw_id" {
+  type        = string
+  description = "Use existing Internet Gateway ID when enable_vpc = false"
+  default     = null
+}
+
+variable "key_pair" {
+  type        = string
+  description = "SSH key pair name"
+  default     = null
+}
+
+variable "nat_id" {
+  type        = string
+  description = "Use existing NAT Gateway ID "
+  default     = null
+}
+
+variable "public_rt_id" {
+  type        = string
+  description = "Use existing Public Route Table ID "
+  default     = null
 }

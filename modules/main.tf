@@ -23,17 +23,26 @@ resource "aws_key_pair" "jenkins-key-pair" {
   depends_on = [tls_private_key.sskeygen-execution]
   key_name   = "jenkins-public"
   public_key = tls_private_key.sskeygen-execution.public_key_openssh
+  count      = var.create_vpc ? 1 : 0
 }
 
 module "vpc" {
   source               = "./vpc"
   available_zones_list = var.available_zones_list
+  count                = var.create_vpc ? 1 : 0
+
+}
+
+locals {
+  vpc_id_final   = var.create_vpc ? module.vpc[0].vpc_id : var.vpc_id
+  igw_id_final   = var.create_vpc ? module.vpc[0].internet_gateway_id : var.igw_id
+  key_pair_final = var.create_vpc ? aws_key_pair.jenkins-key-pair[0].key_name : var.key_pair
 }
 
 
 module "sg" {
   source      = "./security_group"
-  main_vpc_id = module.vpc.vpc_id
+  main_vpc_id = local.vpc_id_final
 }
 
 module "iam_ssm" {
@@ -44,13 +53,13 @@ module "iam_ssm" {
 module "consul_server" {
   source               = "./consul_server"
   env                  = var.env
-  vpc_id               = module.vpc.vpc_id
+  vpc_id               = local.vpc_id_final
   availability_zone    = var.availability_zone
   ami_id               = var.birdwatching_ami_id
   instance_type        = "t3.micro"
-  key_pair             = aws_key_pair.jenkins-key-pair.key_name
+  key_pair             = local.key_pair_final
   private_subnet_cidr  = "10.0.9.0/24"
-  nat_gateway_id       = module.lb[0].nat_gateway_id
+  nat_gateway_id       = var.nat_id 
   allowed_cidrs        = ["10.0.0.0/16"]
   iam_instance_profile = module.iam_ssm[0].ssm_instance_profile_name
   common_tags          = { env = var.env }
@@ -58,54 +67,30 @@ module "consul_server" {
 }
 
 module "jenkins" {
-  source            = "git::https://github.com/The-A-Team-organization/iac_core.git//modules/jenkins?ref=TAT-86-Create-Stage-Infrastructure-Terraform-Jenkins-ECR-SonarQube-IAM-Cross-Account-Policies"
+  source            = "git::https://github.com/Core5-team/iac_core.git//modules/jenkins?ref=CORE5-14-change-tags-in-iac-core"
   region            = var.aws_region
-  vpc_id            = module.vpc.vpc_id
-  igw_id            = module.vpc.internet_gateway_id
-  env               = "stage"
+  vpc_id            = local.vpc_id_final
+  igw_id            = local.igw_id_final
+  env               = "stage_01"
   ami               = var.jenkins_ami_id
-  instance_type     = "t3.medium"
-  availability_zone = "eu-central-1a"
+  instance_type     = "c7i-flex.large"
+  availability_zone = "us-east-1a"
   subnet_cidr       = "10.0.1.0/24"
   count             = var.enable_jenkins ? 1 : 0
 }
 
 
-#module "eks" {
-#  source = "git::https://github.com/The-A-Team-organization/illuminati_eks.git?ref=main"
-#
-# cluster_availability_zone_1 = var.cluster_availability_zone_1
-#  cluster_availability_zone_2 = var.cluster_availability_zone_2
-#  private_subnet_cidr_block_1 = var.private_subnet_cidr_block_1
-#  private_subnet_cidr_block_2 = var.private_subnet_cidr_block_2
-#  public_subnet_cidr_block_1  = var.public_subnet_cidr_block_1
-#  public_subnet_cidr_block_2  = var.public_subnet_cidr_block_2
-#
-#  min_size     = var.min_size
-#  max_size     = var.max_size
-#desired_size = var.desired_size
-
-# eks_cluster_name        = var.eks_cluster_name
-#environment_name        = var.environment_name
-#eks_cluster_k8s_version = var.eks_cluster_k8s_version
-
-#  node_instance_types = var.node_instance_types
-#
-#vpc_id                = var.vpc_id
-#public_route_table_id = var.public_route_table_id
-#region                = var.aws_region
-#}
-
 module "lb" {
-  source               = "git::https://github.com/The-A-Team-organization/iac_birdwatching.git//modules/lb?ref=main"
-  vpc_id               = module.vpc.vpc_id
-  igw_id               = module.vpc.internet_gateway_id
+  source               = "git::https://github.com/Core5-team/iac_birdwatching.git//modules/lb?ref=CORE5-16-change-_-to-in-s3-bucket-name"
+  vpc_id               = local.vpc_id_final
+  igw_id               = local.igw_id_final
+  public_rt_id       = var.public_rt_id
   availability_zone    = var.availability_zone
   common_tags          = { env = "stage" }
   env                  = var.env
   ami                  = var.birdwatching_ami_id
   instance_type        = "t3.micro"
-  key_name             = aws_key_pair.jenkins-key-pair.key_name
+  key_name             = local.key_pair_final
   dns_name             = var.birdwatching_dns_name
   public_subnet_cidr   = "10.0.3.0/24"
   iam_instance_profile = module.iam_ssm[0].ssm_instance_profile_name
@@ -113,16 +98,16 @@ module "lb" {
 }
 
 module "web" {
-  source                  = "git::https://github.com/The-A-Team-organization/iac_birdwatching.git//modules/web?ref=main"
-  vpc_id                  = module.vpc.vpc_id
+  source      = "git::https://github.com/Core5-team/iac_birdwatching.git//modules/web?ref=CORE5-16-change-_-to-in-s3-bucket-name"
+  vpc_id                  = local.vpc_id_final
   availability_zone       = var.availability_zone
   common_tags             = { env = "stage" }
   env                     = var.env
   ami                     = var.birdwatching_ami_id
   instance_type           = "t3.micro"
-  key_name                = aws_key_pair.jenkins-key-pair.key_name
+  key_name                = local.key_pair_final
   private_web_subnet_cidr = "10.0.4.0/24"
-  nat_gateway_id          = module.lb[0].nat_gateway_id
+  nat_gateway_id       = var.nat_id 
   allowed_cidrs = [
     module.lb[0].security_group_id,
     module.consul_server[0].consul_server_security_group_id,
@@ -132,16 +117,16 @@ module "web" {
 }
 
 module "db" {
-  source            = "git::https://github.com/The-A-Team-organization/iac_birdwatching.git//modules/db?ref=main"
-  vpc_id            = module.vpc.vpc_id
+  source      = "git::https://github.com/Core5-team/iac_birdwatching.git//modules/db?ref=CORE5-16-change-_-to-in-s3-bucket-name"
+  vpc_id            = local.vpc_id_final
   availability_zone = var.availability_zone
   common_tags       = { env = "stage" }
   env               = var.env
   ami               = var.birdwatching_ami_id
   instance_type     = "t3.micro"
-  key_pair          = aws_key_pair.jenkins-key-pair.key_name
+  key_pair          = local.key_pair_final
   db_subnet_cidr    = "10.0.5.0/24"
-  nat_gateway_id    = module.lb[0].nat_gateway_id
+  nat_gateway_id       = var.nat_id 
   allowed_cidrs = [
     module.web[0].security_group_id,
     module.consul_server[0].consul_server_security_group_id,
@@ -152,7 +137,7 @@ module "db" {
 }
 
 module "images_bucket" {
-  source      = "git::https://github.com/The-A-Team-organization/iac_birdwatching.git//modules/s3_images?ref=main"
+  source      = "git::https://github.com/Core5-team/iac_birdwatching.git//modules/s3_images?ref=CORE5-16-change-_-to-in-s3-bucket-name"
   env         = var.env
   project     = "birdwatching"
   common_tags = { env = var.env }
@@ -160,15 +145,15 @@ module "images_bucket" {
 
 module "monitoring" {
   source              = "./monitoring_server"
-  vpc_id              = module.vpc.vpc_id
+  vpc_id              = local.vpc_id_final
   availability_zone   = var.availability_zone
   common_tags         = { env = var.env }
   env                 = var.env
   ami                 = var.birdwatching_ami_id
   instance_type       = "c7i-flex.large"
-  key_pair            = aws_key_pair.jenkins-key-pair.key_name
+  key_pair            = local.key_pair_final
   private_subnet_cidr = "10.0.8.0/24"
-  nat_gateway_id      = module.lb[0].nat_gateway_id
+  nat_gateway_id       = var.nat_id 
   allowed_cidrs = [
     module.lb[0].security_group_id,
     module.web[0].security_group_id,
@@ -180,9 +165,3 @@ module "monitoring" {
   count                = var.enable_monitoring ? 1 : 0
 }
 
-# module "sonarqube" {
-#   source = "url"
-#   vpc_id = module.vpc.vpc_id
-#   sg_id  = module.sg.sg_id
-#   count  = var.enable_sonarqube ? 1 : 0
-# }

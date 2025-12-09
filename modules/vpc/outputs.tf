@@ -22,3 +22,10 @@ output "internet_gateway_id" {
   value = aws_internet_gateway.main_igw.id
 }
 
+output "public_route_table_id" {
+  value = aws_route_table.public_route_table.id
+}
+
+output "aws_nat_gateway_id" {
+  value = aws_nat_gateway.main_nat.id
+}
